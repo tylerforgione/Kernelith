@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/bench/">
+    <Project Path="bench/Kernelith.Bench/Kernelith.Bench.csproj" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/Kernelith.Runtime/Kernelith.Runtime.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Kernelth.Runtime.Tests/Kernelth.Runtime.Tests.csproj" />
+  </Folder>
+</Solution>
