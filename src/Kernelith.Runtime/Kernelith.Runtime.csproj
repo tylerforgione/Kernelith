@@ -1,9 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Direct3D.D3D12" Version="1.620.2" />
+    <PackageReference Include="Microsoft.Direct3D.DXC" Version="1.9.2609.5" />
+    <PackageReference Include="TerraFX.Interop.Windows" Version="10.0.28000" />
+  </ItemGroup>
 
 </Project>
