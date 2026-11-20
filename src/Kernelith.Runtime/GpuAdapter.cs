@@ -1,9 +1,9 @@
 using TerraFX.Interop.DirectX;
 using TerraFX.Interop.Windows;
 
-using static TerraFX.Interop.DirectX.DirectX;   // CreateDXGIFactory2, DXGI_* consts
+using static TerraFX.Interop.DirectX.DirectX;   // CreateDXGIFactory2, some DXGI_* consts
 using static TerraFX.Interop.Windows.Windows;   // __uuidof<T>()
-using static TerraFX.Interop.DirectX.DXGI;
+using static TerraFX.Interop.DirectX.DXGI;    // DXGI_ADAPTER_FLAG.*
 
 namespace Kernelith.Runtime;
 
