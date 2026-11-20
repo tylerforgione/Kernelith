@@ -34,28 +34,35 @@ public sealed unsafe class GpuDevice : IDisposable
             }
         }
 
-        using ComPtr<IDXGIFactory4> factory = default;
-        Check.ThrowIfFailed(CreateDXGIFactory2(DebugLayerEnabled ? DXGI_CREATE_FACTORY_DEBUG : 0u, __uuidof<IDXGIFactory4>(), (void**)factory.GetAddressOf()));
-
-        using ComPtr<IDXGIAdapter1> dxgiAdapter = default;
-        Check.ThrowIfFailed(factory.Get()->EnumAdapterByLuid(adapter.Luid, __uuidof<IDXGIAdapter1>(), (void**)dxgiAdapter.GetAddressOf()));
-
-        Check.ThrowIfFailed(D3D12CreateDevice((IUnknown*)dxgiAdapter.Get(), D3D_FEATURE_LEVEL.D3D_FEATURE_LEVEL_12_0, __uuidof<ID3D12Device>(), (void**)_device.GetAddressOf()));
-
-        if (DebugLayerEnabled)
+        try
         {
-            _device.Get()->QueryInterface(__uuidof<ID3D12InfoQueue>(), (void**)_infoQueue.GetAddressOf());
-            if (Debugger.IsAttached)
+            using ComPtr<IDXGIFactory4> factory = default;
+            Check.ThrowIfFailed(CreateDXGIFactory2(DebugLayerEnabled ? DXGI_CREATE_FACTORY_DEBUG : 0u, __uuidof<IDXGIFactory4>(), (void**)factory.GetAddressOf()));
+
+            using ComPtr<IDXGIAdapter1> dxgiAdapter = default;
+            Check.ThrowIfFailed(factory.Get()->EnumAdapterByLuid(adapter.Luid, __uuidof<IDXGIAdapter1>(), (void**)dxgiAdapter.GetAddressOf()));
+
+            Check.ThrowIfFailed(D3D12CreateDevice((IUnknown*)dxgiAdapter.Get(), D3D_FEATURE_LEVEL.D3D_FEATURE_LEVEL_12_0, __uuidof<ID3D12Device>(), (void**)_device.GetAddressOf()));
+
+            if (DebugLayerEnabled)
             {
-                _infoQueue.Get()->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY.D3D12_MESSAGE_SEVERITY_ERROR, TRUE);
+                if (_device.Get()->QueryInterface(__uuidof<ID3D12InfoQueue>(), (void**)_infoQueue.GetAddressOf()).SUCCEEDED && Debugger.IsAttached)
+                {
+                    _infoQueue.Get()->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY.D3D12_MESSAGE_SEVERITY_ERROR, TRUE);
+                }
             }
+        }
+        catch
+        {
+            Dispose();
+            throw;
         }
     }
 
     public void Dispose()
     {
-        _device.Dispose();
         _infoQueue.Dispose();
+        _device.Dispose();
     }
 
     public string DrainMessages()
@@ -63,7 +70,7 @@ public sealed unsafe class GpuDevice : IDisposable
         ID3D12InfoQueue* queue = _infoQueue.Get();
         if (queue is null) return string.Empty;
 
-        ulong count = queue->GetNumStoredMessages();
+        ulong count = queue->GetNumStoredMessagesAllowedByRetrievalFilter();
         if (count == 0) return string.Empty;
 
         var sb = new StringBuilder();
